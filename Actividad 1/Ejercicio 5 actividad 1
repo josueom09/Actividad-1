@@ -1,0 +1,25 @@
+import java.util.Scanner;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ingrese el radio del circulo: ");
+        double r = scanner.nextDouble();
+        double area = circulo.calcular_area(r);
+        double circunferencia = circulo.calcular_circunferencia(r);
+        
+        System.out.println("EL radio de tu circulo es de " + r);
+        System.out.println("EL area de tu circulo es de " + area);
+        System.out.println("La circunferencia de tu circulo es de " + circunferencia);
+        
+    }      
+}
+
+class circulo{
+    public static double calcular_area(double r){
+        return Math.PI * Math.pow(r,2);
+    }
+    public static double calcular_circunferencia(double r){
+        return 2 * Math.PI * r;
+    }
+}
