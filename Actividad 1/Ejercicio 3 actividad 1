@@ -1,0 +1,27 @@
+class Main {
+    public static void main(String[] args) {
+        double horast = 48;
+        double valorh = 5000;
+        double retencion = 12.5/100;
+
+        double bruto = calcular_salario.salario_bruto(horast, valorh);
+        double fuente = calcular_salario.retencion_fuente(bruto, retencion);
+        double neto = calcular_salario.salario_neto(bruto,fuente);
+
+        System.out.println("El salario bruto es: " + bruto);
+        System.out.println("La retencion fuente es : " + fuente);
+        System.out.println("El salario neto es: " + neto);
+    }      
+}
+
+class calcular_salario{
+    public static double salario_bruto(double horast, double valorh){
+        return horast * valorh;
+    }
+    public static double retencion_fuente(double bruto, double retencion){
+        return bruto * retencion;
+    }
+    public static double salario_neto(double bruto,double fuente){
+        return bruto - fuente;
+    }
+}
