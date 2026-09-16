@@ -1,0 +1,25 @@
+import java.util.Scanner;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ingrese el valor del numero deseado: ");
+        double x = scanner.nextDouble();
+        double y = potenciacion.calcular_cuadrado(x);
+        double z = potenciacion.calcular_cubo(x);
+        
+        System.out.println("EL valor de tu numero es " + x);
+        System.out.println("EL valor de tu numero al cuadrado es " + y);
+        System.out.println("EL valor de tu numero al cubo es " + z);
+        
+    }      
+}
+
+class potenciacion{
+    public static double calcular_cuadrado(double y){
+        return Math.pow(y,2);
+    }
+    public static double calcular_cubo(double z){
+        return Math.pow(z,3);
+    }
+}
