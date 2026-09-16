@@ -1,0 +1,25 @@
+class Main {
+    public static void main(String[] args) {
+        double suma = 0;
+        double x = 20;
+        suma = operaciones.calcular1(suma, x);
+        double y = 40;
+        x = operaciones.calcular2(x, y);
+        suma = operaciones.calcular3(suma, x, y);
+
+        System.out.println("El calor de suma es: " + suma);
+        
+    }      
+}
+
+class operaciones{
+    public static double calcular1(double suma,double x){
+        return suma = suma + x;
+    }
+    public static double calcular2(double x,double y){
+        return x = x + Math.pow(y,2);
+    }
+    public static double calcular3(double suma,double x,double y){
+        return suma = suma + (x/y);
+    }
+}
