@@ -1,0 +1,39 @@
+class persona {
+    String nombre;
+    String apellido;
+    String numeroID;
+    int birthday;
+    String nacionalidad;
+    char genero;
+
+    persona(String nombre, String apellido, String numeroID, int birthday, String nacionalidad, char genero) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.numeroID = numeroID;
+        this.birthday = birthday;
+        this.nacionalidad = nacionalidad;
+        this.genero = genero;
+    }
+    void imprimir() {
+        System.out.println("Nombre = " + nombre);
+        System.out.println("Apellido = " + apellido);
+        System.out.println("Numero de documento identidad = " + numeroID);
+        System.out.println("Fecha de nacimiento = " + birthday);
+        System.out.println("Nacionalidad = " + nacionalidad);
+        System.out.println("Genero = " + genero);
+        System.out.println();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        persona p1 = new persona("Pedro", "Perez", "1053121010", 1998, "Colombiano", 'H');
+        persona p2 = new persona("Luis", "Leon", "1053223344", 2001, "Venezolano", 'H');
+        persona p3 = new persona("Maria", "Ospina", "1052697415", 2004, "Uruguaya", 'M');
+
+        p1.imprimir();
+        p2.imprimir();
+        p3.imprimir();
+    }
+}
+
