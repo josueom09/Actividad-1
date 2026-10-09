@@ -1,0 +1,117 @@
+public class CuentaBancaria {
+
+    String nombresTitular;
+    String apellidosTitular;
+    int numeroCuenta;
+
+    enum TipoCuenta {
+        AHORROS, CORRIENTE
+    }
+
+    TipoCuenta tipoCuenta;
+
+    float saldo = 0;
+
+    double interesMensual;
+
+    CuentaBancaria(
+            String nombresTitular,
+            String apellidosTitular,
+            int numeroCuenta,
+            TipoCuenta tipoCuenta,
+            double interesMensual) {
+
+        this.nombresTitular = nombresTitular;
+        this.apellidosTitular = apellidosTitular;
+        this.numeroCuenta = numeroCuenta;
+        this.tipoCuenta = tipoCuenta;
+        this.interesMensual = interesMensual;
+    }
+
+    void imprimir() {
+        System.out.println("Nombres = " + nombresTitular);
+        System.out.println("Apellidos = " + apellidosTitular);
+        System.out.println("Numero cuenta = " + numeroCuenta);
+        System.out.println("Tipo cuenta = " + tipoCuenta);
+        System.out.println("Saldo = " + saldo);
+        System.out.println("Interes mensual = "
+                + interesMensual + "%");
+    }
+
+    void consultarSaldo() {
+        System.out.println(
+                "Saldo actual = " + saldo);
+    }
+
+    boolean consignar(int valor) {
+
+        if (valor > 0) {
+
+            saldo += valor;
+
+            System.out.println(
+                "Se consignaron $" + valor);
+
+            return true;
+
+        } else {
+
+            System.out.println(
+                "Valor invalido");
+
+            return false;
+        }
+    }
+
+    boolean retirar(int valor) {
+
+        if (valor > 0 &&
+                valor <= saldo) {
+
+            saldo -= valor;
+
+            System.out.println(
+                "Se retiraron $" + valor);
+
+            return true;
+
+        } else {
+
+            System.out.println(
+                "Fondos insuficientes");
+
+            return false;
+        }
+    }
+
+    void aplicarInteres() {
+
+        saldo += saldo *
+                (interesMensual / 100);
+
+        System.out.println(
+                "Nuevo saldo con interes = "
+                        + saldo);
+    }
+
+    public static void main(String[] args) {
+
+        CuentaBancaria cuenta =
+                new CuentaBancaria(
+                        "Pedro",
+                        "Perez",
+                        123456789,
+                        TipoCuenta.AHORROS,
+                        2.5);
+
+        cuenta.imprimir();
+
+        cuenta.consignar(200000);
+
+        cuenta.consignar(300000);
+
+        cuenta.retirar(400000);
+
+        cuenta.aplicarInteres();
+    }
+}
