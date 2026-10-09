@@ -1,0 +1,71 @@
+enum TipoPlaneta {
+    GASEOSO,
+    TERRESTRE,
+    ENANO
+}
+
+class Planeta {
+
+    String nombre;
+    int satelites;
+    double masa;
+    double volumen;
+    int diametro;
+    int distanciaSol;
+    double periodoOrbital;
+    double periodoRotacion;
+    TipoPlaneta tipo;
+    boolean observable;
+
+    Planeta(String nombre, int satelites, double masa,
+            double volumen, int diametro, int distanciaSol,
+            double periodoOrbital, double periodoRotacion,
+            TipoPlaneta tipo, boolean observable) {
+
+        this.nombre = nombre;
+        this.satelites = satelites;
+        this.masa = masa;
+        this.volumen = volumen;
+        this.diametro = diametro;
+        this.distanciaSol = distanciaSol;
+        this.periodoOrbital = periodoOrbital;
+        this.periodoRotacion = periodoRotacion;
+        this.tipo = tipo;
+        this.observable = observable;
+    }
+
+    void imprimir() {
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Satelites: " + satelites);
+        System.out.println("Masa: " + masa);
+        System.out.println("Volumen: " + volumen);
+        System.out.println("Diametro: " + diametro);
+        System.out.println("Distancia al Sol: " + distanciaSol);
+        System.out.println("Periodo orbital: " + periodoOrbital);
+        System.out.println("Periodo de rotacion: " + periodoRotacion);
+        System.out.println("Tipo: " + tipo);
+        System.out.println("Observable: " + observable);
+    }
+
+    double calcularDensidad() {
+        return masa / volumen;
+    }
+
+    boolean esExterior() {
+        double limite = 149597870 * 3.4;
+        return distanciaSol > limite;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        Planeta tierra = new Planeta(
+            "Tierra", 1, 5.9736E24, 1.08321E12,
+            12742, 150000000,
+            1.0, 1.0,
+            TipoPlaneta.TERRESTRE, true);
+
+        tierra.imprimir();
+    }
+}
