@@ -1,0 +1,147 @@
+import java.util.Scanner;
+
+public class Main {
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int opcion;
+        do {
+            System.out.println("\n=== FIGURAS GEOMETRICAS ===");
+            System.out.println("1. Cilindro");
+            System.out.println("2. Esfera");
+            System.out.println("3. Piramide");
+            System.out.println("0. Salir");
+            opcion = (int) leerNumero("Seleccione una opcion: ");
+
+            switch (opcion) {
+                case 1:
+                    double radioC = leerNumero("Radio (cms): ");
+                    double alturaC = leerNumero("Altura (cms): ");
+                    Cilindro cilindro = new Cilindro(radioC, alturaC);
+                    mostrarResultado(cilindro);
+                    break;
+                case 2:
+                    double radioE = leerNumero("Radio (cms): ");
+                    Esfera esfera = new Esfera(radioE);
+                    mostrarResultado(esfera);
+                    break;
+                case 3:
+                    double baseP = leerNumero("Base (cms): ");
+                    double alturaP = leerNumero("Altura (cms): ");
+                    double apotema = leerNumero("Apotema (cms): ");
+                    Piramide piramide = new Piramide(baseP, alturaP, apotema);
+                    mostrarResultado(piramide);
+                    break;
+                case 0:
+                    System.out.println("Programa finalizado.");
+                    break;
+                default:
+                    System.out.println("Opcion no valida.");
+            }
+        } while (opcion != 0);
+
+        sc.close();
+    }
+
+    static double leerNumero(String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
+            String entrada = sc.nextLine().trim();
+            try {
+                return Double.parseDouble(entrada);
+            } catch (NumberFormatException e) {
+                System.out.println("Alerta: debe ingresar un valor numerico.");
+            }
+        }
+    }
+
+    static void mostrarResultado(FiguraGeometrica figura) {
+        System.out.println("Volumen (cm3): " + String.format("%.2f", figura.getVolumen()));
+        System.out.println("Superficie (cm2): " + String.format("%.2f", figura.getSuperficie()));
+    }
+}
+
+class FiguraGeometrica {
+    private double volumen;
+    private double superficie;
+
+    public void setVolumen(double volumen) {
+        this.volumen = volumen;
+    }
+
+    public void setSuperficie(double superficie) {
+        this.superficie = superficie;
+    }
+
+    public double getVolumen() {
+        return this.volumen;
+    }
+
+    public double getSuperficie() {
+        return this.superficie;
+    }
+}
+
+class Cilindro extends FiguraGeometrica {
+    private double radio;
+    private double altura;
+
+    public Cilindro(double radio, double altura) {
+        this.radio = radio;
+        this.altura = altura;
+        this.setVolumen(calcularVolumen());
+        this.setSuperficie(calcularSuperficie());
+    }
+
+    public double calcularVolumen() {
+        return Math.PI * altura * Math.pow(radio, 2.0);
+    }
+
+    public double calcularSuperficie() {
+        double areaLadoA = 2.0 * Math.PI * radio * altura;
+        double areaLadoB = 2.0 * Math.PI * Math.pow(radio, 2.0);
+        return areaLadoA + areaLadoB;
+    }
+}
+
+class Esfera extends FiguraGeometrica {
+    private double radio;
+
+    public Esfera(double radio) {
+        this.radio = radio;
+        this.setVolumen(calcularVolumen());
+        this.setSuperficie(calcularSuperficie());
+    }
+
+    public double calcularVolumen() {
+        return 1.333 * Math.PI * Math.pow(this.radio, 3.0);
+    }
+
+    public double calcularSuperficie() {
+        return 4.0 * Math.PI * Math.pow(this.radio, 2.0);
+    }
+}
+
+class Piramide extends FiguraGeometrica {
+    private double base;
+    private double altura;
+    private double apotema;
+
+    public Piramide(double base, double altura, double apotema) {
+        this.base = base;
+        this.altura = altura;
+        this.apotema = apotema;
+        this.setVolumen(calcularVolumen());
+        this.setSuperficie(calcularSuperficie());
+    }
+
+    public double calcularVolumen() {
+        return (Math.pow(base, 2.0) * altura) / 3.0;
+    }
+
+    public double calcularSuperficie() {
+        double areaBase = Math.pow(base, 2.0);
+        double areaLado = 2.0 * base * apotema;
+        return areaBase + areaLado;
+    }
+}
