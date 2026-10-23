@@ -1,0 +1,98 @@
+
+import java.util.Scanner;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Notas notas = new Notas();
+
+        System.out.println("CALCULO DE NOTAS");
+        System.out.println("----------------");
+
+        for (int i = 0; i < notas.listaNotas.length; i++) {
+            while (true) {
+                System.out.print("Ingrese la nota " + (i + 1) + ": ");
+                String entrada = scanner.nextLine().trim();
+
+                if (entrada.isEmpty()) {
+                    System.out.println("Alerta: debe ingresar la nota.");
+                    continue;
+                }
+
+                try {
+                    notas.listaNotas[i] = Double.parseDouble(entrada);
+                    break;
+                } catch (NumberFormatException e) {
+                    System.out.println(
+                        "Alerta: debe ingresar un valor numerico."
+                    );
+                }
+            }
+        }
+
+        System.out.println("\nRESULTADOS");
+        System.out.printf("Promedio = %.2f%n",
+                notas.calcularPromedio());
+        System.out.printf("Desviacion estandar = %.2f%n",
+                notas.calcularDesviacion());
+        System.out.printf("Nota mayor = %.2f%n",
+                notas.calcularMayor());
+        System.out.printf("Nota menor = %.2f%n",
+                notas.calcularMenor());
+
+        scanner.close();
+    }
+}
+
+class Notas {
+    double[] listaNotas;
+
+    public Notas() {
+        listaNotas = new double[5];
+    }
+
+    double calcularPromedio() {
+        double suma = 0;
+
+        for (int i = 0; i < listaNotas.length; i++) {
+            suma += listaNotas[i];
+        }
+
+        return suma / listaNotas.length;
+    }
+
+    double calcularDesviacion() {
+        double promedio = calcularPromedio();
+        double suma = 0;
+
+        for (int i = 0; i < listaNotas.length; i++) {
+            suma += Math.pow(listaNotas[i] - promedio, 2);
+        }
+
+        return Math.sqrt(suma / listaNotas.length);
+    }
+
+    double calcularMenor() {
+        double menor = listaNotas[0];
+
+        for (int i = 1; i < listaNotas.length; i++) {
+            if (listaNotas[i] < menor) {
+                menor = listaNotas[i];
+            }
+        }
+
+        return menor;
+    }
+
+    double calcularMayor() {
+        double mayor = listaNotas[0];
+
+        for (int i = 1; i < listaNotas.length; i++) {
+            if (listaNotas[i] > mayor) {
+                mayor = listaNotas[i];
+            }
+        }
+
+        return mayor;
+    }
+}
