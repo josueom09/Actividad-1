@@ -1,0 +1,110 @@
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.util.function.DoubleUnaryOperator;
+import java.util.Locale;
+
+public class PanelCalculos extends JPanel {
+    public static final String TITULO = "Ejercicio 3 – Cálculos numéricos";
+
+    private static final Locale CO = Locale.forLanguageTag("es-CO");
+
+    private final JTextField txtValor = Estilo.campo("txtValor", 14);
+    private final JTextArea txtSalida = Estilo.areaSalida("txtSalida");
+
+    public PanelCalculos() {
+        setLayout(new BorderLayout());
+        add(Estilo.encabezado("Ejercicio 3 · Catch múltiples (6.6)",
+                "Texto guía, pág. 412 – Clase CalculosNumericos"), BorderLayout.NORTH);
+
+        JPanel entrada = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+        entrada.setBorder(BorderFactory.createTitledBorder("Valor numérico"));
+        entrada.add(new JLabel("Valor ="));
+        entrada.add(txtValor);
+
+        txtSalida.setLineWrap(true);
+        txtSalida.setWrapStyleWord(true);
+
+        JButton btnLog = Estilo.boton("btnLog", "Logaritmo neperiano");
+        JButton btnRaiz = Estilo.boton("btnRaiz", "Raíz cuadrada");
+        JButton btnAmbos = Estilo.boton("btnAmbos", "Calcular ambos");
+        JButton btnLimpiar = Estilo.boton("btnLimpiar", "Limpiar");
+        btnLog.addActionListener(e -> calcular(true, false));
+        btnRaiz.addActionListener(e -> calcular(false, true));
+        btnAmbos.addActionListener(e -> calcular(true, true));
+        btnLimpiar.addActionListener(e -> {
+            txtValor.setText("");
+            txtSalida.setText("");
+        });
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 6));
+        botones.add(btnLog);
+        botones.add(btnRaiz);
+        botones.add(btnAmbos);
+        botones.add(btnLimpiar);
+
+        JPanel arriba = new JPanel(new BorderLayout());
+        arriba.add(entrada, BorderLayout.NORTH);
+        arriba.add(botones, BorderLayout.SOUTH);
+
+        JPanel centro = new JPanel(new BorderLayout(0, 8));
+        centro.setBorder(new EmptyBorder(14, 14, 14, 14));
+        centro.add(arriba, BorderLayout.NORTH);
+        centro.add(Estilo.conScroll(txtSalida, "Resultados"), BorderLayout.CENTER);
+        add(centro, BorderLayout.CENTER);
+
+        setPreferredSize(new Dimension(640, 480));
+    }
+
+    private void calcular(boolean logaritmo, boolean raiz) {
+        String texto = txtValor.getText();
+        if (logaritmo) {
+            txtSalida.append(ejecutar("Logaritmo neperiano", CalculosNumericos::calcularLogaritmoNeperiano, texto) + "\n");
+        }
+        if (raiz) {
+            txtSalida.append(ejecutar("Raíz cuadrada", CalculosNumericos::calcularRaizCuadrada, texto) + "\n");
+        }
+        txtSalida.append("\n");
+    }
+
+    private String ejecutar(String nombre, DoubleUnaryOperator operacion, String texto) {
+        try {
+            double valor = CalculosNumericos.leerValor(texto);
+            double resultado = operacion.applyAsDouble(valor);
+            return String.format(CO, "%s (%s) = %.6f", nombre, texto.trim(), resultado);
+        } catch (ArithmeticException e) {
+            return nombre + ": " + e.getMessage();
+        } catch (NumberFormatException e) {
+            return nombre + ": El valor debe ser numérico.";
+        }
+    }
+}
+
+class CalculosNumericos {
+    private CalculosNumericos() {
+    }
+
+    public static double calcularLogaritmoNeperiano(double valor) {
+        if (valor <= 0) {
+            throw new ArithmeticException("El valor debe ser un número positivo para calcular el logaritmo.");
+        }
+        return Math.log(valor);
+    }
+
+    public static double calcularRaizCuadrada(double valor) {
+        if (valor < 0) {
+            throw new ArithmeticException("El valor no puede ser negativo para calcular la raíz cuadrada.");
+        }
+        return Math.sqrt(valor);
+    }
+
+    public static double leerValor(String texto) {
+        if (texto == null || texto.isBlank()) {
+            throw new NumberFormatException("Valor vacío");
+        }
+        double valor = Double.parseDouble(texto.trim().replace(',', '.'));
+        if (Double.isNaN(valor) || Double.isInfinite(valor)) {
+            throw new NumberFormatException("Valor no finito");
+        }
+        return valor;
+    }
+}
