@@ -1,0 +1,121 @@
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+
+public class PanelVendedor extends JPanel {
+    public static final String TITULO = "Ejercicio 2 – Vendedor";
+
+    private final JTextField txtNombre = Estilo.campo("txtNombre", 20);
+    private final JTextField txtApellidos = Estilo.campo("txtApellidos", 20);
+    private final JTextField txtEdad = Estilo.campo("txtEdad", 6);
+    private final JLabel lblEstado = new JLabel(" ");
+    private final JTextArea txtSalida = Estilo.areaSalida("txtSalida");
+
+    public PanelVendedor() {
+        setLayout(new BorderLayout());
+        add(Estilo.encabezado("Ejercicio 2 · Lanzamiento de excepciones (6.5)",
+                "Texto guía, pág. 406 – Clase Vendedor"), BorderLayout.NORTH);
+
+        JPanel formulario = new JPanel(new GridBagLayout());
+        formulario.setBorder(BorderFactory.createTitledBorder("Datos del vendedor"));
+        JPanel interior = new JPanel(new GridBagLayout());
+        interior.setBorder(new EmptyBorder(4, 10, 4, 10));
+        Estilo.fila(interior, 0, "Nombre:", txtNombre);
+        Estilo.fila(interior, 1, "Apellidos:", txtApellidos);
+        Estilo.fila(interior, 2, "Edad:", txtEdad);
+        formulario.add(interior, new GridBagConstraints(0, 0, 1, 1, 1, 1,
+                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+
+        JButton btnCrear = Estilo.boton("btnCrear", "Crear vendedor");
+        JButton btnLimpiar = Estilo.boton("btnLimpiar", "Limpiar");
+        btnCrear.addActionListener(e -> crearVendedor());
+        btnLimpiar.addActionListener(e -> limpiar());
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 6));
+        botones.add(btnLimpiar);
+        botones.add(btnCrear);
+
+        lblEstado.setName("lblEstado");
+        lblEstado.setBorder(new EmptyBorder(4, 4, 4, 4));
+
+        JPanel arriba = new JPanel(new BorderLayout());
+        arriba.add(formulario, BorderLayout.CENTER);
+        arriba.add(botones, BorderLayout.SOUTH);
+
+        JPanel resultado = new JPanel(new BorderLayout());
+        resultado.add(lblEstado, BorderLayout.NORTH);
+        resultado.add(Estilo.conScroll(txtSalida, "Datos del vendedor"), BorderLayout.CENTER);
+
+        JPanel centro = new JPanel(new BorderLayout(0, 8));
+        centro.setBorder(new EmptyBorder(14, 14, 14, 14));
+        centro.add(arriba, BorderLayout.NORTH);
+        centro.add(resultado, BorderLayout.CENTER);
+        add(centro, BorderLayout.CENTER);
+
+        setPreferredSize(new Dimension(560, 520));
+    }
+
+    private void crearVendedor() {
+        try {
+            int edad = Integer.parseInt(txtEdad.getText().trim());
+            Vendedor vendedor = new Vendedor(txtNombre.getText(), txtApellidos.getText());
+            vendedor.verificarEdad(edad);
+            txtSalida.setText(vendedor.imprimir());
+            Estilo.estado(lblEstado, "Vendedor creado correctamente.", false);
+        } catch (NumberFormatException e) {
+            txtSalida.setText("");
+            Estilo.estado(lblEstado, "Excepción NumberFormatException: la edad debe ser un número entero.", true);
+        } catch (IllegalArgumentException e) {
+            txtSalida.setText("");
+            Estilo.estado(lblEstado, "Excepción IllegalArgumentException: " + e.getMessage(), true);
+        }
+    }
+
+    private void limpiar() {
+        txtNombre.setText("");
+        txtApellidos.setText("");
+        txtEdad.setText("");
+        txtSalida.setText("");
+        lblEstado.setText(" ");
+        txtNombre.requestFocusInWindow();
+    }
+}
+
+class Vendedor {
+    public static final int EDAD_MINIMA = 18;
+    public static final int EDAD_MAXIMA = 120;
+
+    private final String nombre;
+    private final String apellidos;
+    private int edad;
+
+    public Vendedor(String nombre, String apellidos) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("El nombre del vendedor es obligatorio.");
+        }
+        if (apellidos == null || apellidos.isBlank()) {
+            throw new IllegalArgumentException("Los apellidos del vendedor son obligatorios.");
+        }
+        this.nombre = nombre.trim();
+        this.apellidos = apellidos.trim();
+    }
+
+    public void verificarEdad(int edad) {
+        if (edad < 0 || edad > EDAD_MAXIMA) {
+            throw new IllegalArgumentException("La edad no puede ser negativa ni mayor a " + EDAD_MAXIMA + ".");
+        }
+        if (edad < EDAD_MINIMA) {
+            throw new IllegalArgumentException("El vendedor debe ser mayor de " + EDAD_MINIMA + " años.");
+        }
+        this.edad = edad;
+    }
+
+    public String imprimir() {
+        return "Nombre del vendedor = " + nombre + "\n"
+             + "Apellidos del vendedor = " + apellidos + "\n"
+             + "Edad del vendedor = " + edad;
+    }
+
+    public String getNombre()    { return nombre; }
+    public String getApellidos() { return apellidos; }
+    public int getEdad()         { return edad; }
+}
