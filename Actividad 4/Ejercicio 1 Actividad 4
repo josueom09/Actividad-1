@@ -1,84 +1,231 @@
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.function.Consumer;
 
-public class PanelPruebaExcepciones extends JPanel {
-    public static final String TITULO = "Ejercicio 1 – Prueba de excepciones";
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
-    private final JTextArea txtSalida = Estilo.areaSalida("txtSalida");
-    private final JTextArea txtExplicacion = Estilo.areaSalida("txtExplicacion");
+public class Main {
 
-    public PanelPruebaExcepciones() {
-        setLayout(new BorderLayout());
-        add(Estilo.encabezado("Ejercicio 1 · Excepciones (6.4)",
-                "Texto guía, pág. 400 – Clase PruebaExcepciones"), BorderLayout.NORTH);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame ventana = new JFrame(PanelPruebaExcepciones.TITULO);
 
-        txtExplicacion.setFont(txtExplicacion.getFont().deriveFont(Font.PLAIN, 12.5f));
-        txtExplicacion.setLineWrap(true);
-        txtExplicacion.setWrapStyleWord(true);
-        txtExplicacion.setText(
-                "Primer bloque try\n"
-              + "• 10000/0 es una división entera por cero y lanza ArithmeticException.\n"
-              + "• «Después de la división» nunca se ejecuta.\n"
-              + "• catch (ArithmeticException) la captura y finally se ejecuta siempre.\n\n"
-              + "Segundo bloque try\n"
-              + "• objeto.toString() con objeto = null lanza NullPointerException.\n"
-              + "• No coincide con catch (ArithmeticException), así que se evalúa el siguiente catch.\n"
-              + "• catch (Exception) sí la captura, porque NullPointerException es una Exception.\n"
-              + "• «Imprimiendo objeto» nunca se ejecuta y finally se ejecuta siempre.");
-
-        JPanel centro = new JPanel(new GridLayout(1, 2, 12, 0));
-        centro.setBorder(new EmptyBorder(14, 14, 6, 14));
-        centro.add(Estilo.conScroll(txtSalida, "Salida del programa"));
-        centro.add(Estilo.conScroll(txtExplicacion, "¿Por qué se imprime esto?"));
-        add(centro, BorderLayout.CENTER);
-
-        JButton btnEjecutar = Estilo.boton("btnEjecutar", "Ejecutar programa");
-        JButton btnLimpiar = Estilo.boton("btnLimpiar", "Limpiar");
-        btnEjecutar.addActionListener(e -> ejecutar());
-        btnLimpiar.addActionListener(e -> txtSalida.setText(""));
-
-        JPanel sur = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        sur.add(btnLimpiar);
-        sur.add(btnEjecutar);
-        add(sur, BorderLayout.SOUTH);
-
-        setPreferredSize(new Dimension(820, 470));
-    }
-
-    private void ejecutar() {
-        txtSalida.setText("");
-        PruebaExcepciones.ejecutar(linea -> txtSalida.append(linea + "\n"));
+            ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            ventana.setContentPane(new PanelPruebaExcepciones());
+            ventana.pack();
+            ventana.setLocationRelativeTo(null);
+            ventana.setVisible(true);
+        });
     }
 }
 
 class PruebaExcepciones {
+
     private PruebaExcepciones() {
     }
 
     public static void ejecutar(Consumer<String> salida) {
+
         try {
             salida.accept("Ingresando al primer try");
-            double cociente = 10000 / 0;
+
+            int divisor = 0;
+            double cociente = 10000 / divisor;
+
             salida.accept("Después de la división");
+
         } catch (ArithmeticException e) {
             salida.accept("División por cero");
+
         } finally {
             salida.accept("Ingresando al primer finally");
         }
 
         try {
             salida.accept("Ingresando al segundo try");
+
             Object objeto = null;
             objeto.toString();
+
             salida.accept("Imprimiendo objeto");
+
         } catch (ArithmeticException e) {
             salida.accept("División por cero");
+
         } catch (Exception e) {
             salida.accept("Ocurrió una excepción");
+
         } finally {
             salida.accept("Ingresando al segundo finally");
         }
+    }
+}
+
+class PanelPruebaExcepciones extends JPanel {
+
+    public static final String TITULO =
+            "Ejercicio 1 – Prueba de excepciones";
+
+    private final JTextArea txtSalida =
+            crearAreaSalida("txtSalida");
+
+    private final JTextArea txtExplicacion =
+            crearAreaSalida("txtExplicacion");
+
+    public PanelPruebaExcepciones() {
+
+        setLayout(new BorderLayout());
+
+        add(crearEncabezado(
+                "Ejercicio 1 · Excepciones (6.4)",
+                "Texto guía, pág. 400 – Clase PruebaExcepciones"
+        ), BorderLayout.NORTH);
+
+        txtExplicacion.setFont(
+                txtExplicacion.getFont().deriveFont(Font.PLAIN, 12.5f)
+        );
+
+        txtExplicacion.setLineWrap(true);
+        txtExplicacion.setWrapStyleWord(true);
+
+        txtExplicacion.setText(
+                "Primer bloque try\n"
+                + "• 10000/0 es una división entera por cero y lanza ArithmeticException.\n"
+                + "• «Después de la división» nunca se ejecuta.\n"
+                + "• catch (ArithmeticException) la captura y finally se ejecuta siempre.\n\n"
+                + "Segundo bloque try\n"
+                + "• objeto.toString() con objeto = null lanza NullPointerException.\n"
+                + "• No coincide con catch (ArithmeticException), así que se evalúa el siguiente catch.\n"
+                + "• catch (Exception) sí la captura, porque NullPointerException es una Exception.\n"
+                + "• «Imprimiendo objeto» nunca se ejecuta y finally se ejecuta siempre."
+        );
+
+        JPanel centro = new JPanel(
+                new GridLayout(1, 2, 12, 0)
+        );
+
+        centro.setBorder(
+                new EmptyBorder(14, 14, 6, 14)
+        );
+
+        centro.add(
+                conScroll(txtSalida, "Salida del programa")
+        );
+
+        centro.add(
+                conScroll(txtExplicacion, "¿Por qué se imprime esto?")
+        );
+
+        add(centro, BorderLayout.CENTER);
+
+        JButton btnEjecutar =
+                crearBoton("btnEjecutar", "Ejecutar programa");
+
+        JButton btnLimpiar =
+                crearBoton("btnLimpiar", "Limpiar");
+
+        btnEjecutar.addActionListener(e -> ejecutar());
+
+        btnLimpiar.addActionListener(
+                e -> txtSalida.setText("")
+        );
+
+        JPanel sur = new JPanel(
+                new FlowLayout(FlowLayout.RIGHT, 10, 10)
+        );
+
+        sur.add(btnLimpiar);
+        sur.add(btnEjecutar);
+
+        add(sur, BorderLayout.SOUTH);
+
+        setPreferredSize(new Dimension(820, 470));
+    }
+
+    private void ejecutar() {
+
+        txtSalida.setText("");
+
+        PruebaExcepciones.ejecutar(
+                linea -> txtSalida.append(linea + "\n")
+        );
+    }
+
+    private JTextArea crearAreaSalida(String nombre) {
+
+        JTextArea area = new JTextArea();
+
+        area.setName(nombre);
+        area.setEditable(false);
+        area.setFont(
+                new Font(Font.MONOSPACED, Font.PLAIN, 13)
+        );
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        return area;
+    }
+
+    private JPanel crearEncabezado(
+            String titulo,
+            String subtitulo
+    ) {
+
+        JPanel panel = new JPanel(new BorderLayout());
+
+        panel.setBorder(
+                new EmptyBorder(12, 14, 12, 14)
+        );
+
+        JLabel etiquetaTitulo = new JLabel(titulo);
+
+        etiquetaTitulo.setFont(
+                etiquetaTitulo.getFont().deriveFont(Font.BOLD, 18f)
+        );
+
+        JLabel etiquetaSubtitulo = new JLabel(subtitulo);
+
+        panel.add(etiquetaTitulo, BorderLayout.NORTH);
+        panel.add(etiquetaSubtitulo, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JScrollPane conScroll(
+            JTextArea area,
+            String titulo
+    ) {
+
+        JScrollPane scroll = new JScrollPane(area);
+
+        scroll.setBorder(
+                BorderFactory.createTitledBorder(titulo)
+        );
+
+        return scroll;
+    }
+
+    private JButton crearBoton(
+            String nombre,
+            String texto
+    ) {
+
+        JButton boton = new JButton(texto);
+
+        boton.setName(nombre);
+
+        return boton;
     }
 }
