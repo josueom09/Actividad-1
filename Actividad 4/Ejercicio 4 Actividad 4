@@ -3,168 +3,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class PanelEquipoMaraton extends JPanel {
-    public static final String TITULO = "Ejercicio 4 – Equipo de maratón de programación";
-
-    private final JTextField txtEquipo = Estilo.campo("txtEquipo", 22);
-    private final JTextField txtUniversidad = Estilo.campo("txtUniversidad", 22);
-    private final JTextField txtLenguaje = Estilo.campo("txtLenguaje", 22);
-    private final JButton btnCrearEquipo = Estilo.boton("btnCrearEquipo", "Crear equipo");
-
-    private final JTextField txtNombre = Estilo.campo("txtNombre", 22);
-    private final JTextField txtApellidos = Estilo.campo("txtApellidos", 22);
-    private final JButton btnAnadir = Estilo.boton("btnAnadir", "Añadir programador");
-    private final JLabel lblContador = new JLabel("Primero cree el equipo.");
-
-    private final DefaultTableModel modeloTabla =
-            new DefaultTableModel(new Object[]{"#", "Nombre", "Apellidos"}, 0) {
-                @Override
-                public boolean isCellEditable(int fila, int columna) {
-                    return false;
-                }
-            };
-    private final JLabel lblEstado = new JLabel(" ");
-
-    private EquipoMaratonProgramacion equipo;
-
-    public PanelEquipoMaraton() {
-        setLayout(new BorderLayout());
-        add(Estilo.encabezado("Ejercicio 4 · Validación de campos (6.7)",
-                "Texto guía, pág. 418 – Clases EquipoMaratonProgramacion y Programador"), BorderLayout.NORTH);
-
-        JPanel datosEquipo = new JPanel(new GridBagLayout());
-        datosEquipo.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("1. Datos del equipo"), new EmptyBorder(2, 10, 6, 10)));
-        Estilo.fila(datosEquipo, 0, "Nombre del equipo:", txtEquipo);
-        Estilo.fila(datosEquipo, 1, "Universidad:", txtUniversidad);
-        Estilo.fila(datosEquipo, 2, "Lenguaje de programación:", txtLenguaje);
-        JButton btnNuevo = Estilo.boton("btnNuevo", "Nuevo equipo");
-        btnCrearEquipo.addActionListener(e -> crearEquipo());
-        btnNuevo.addActionListener(e -> nuevoEquipo());
-        JPanel botonesEquipo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        botonesEquipo.add(btnNuevo);
-        botonesEquipo.add(btnCrearEquipo);
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0; c.gridy = 3; c.gridwidth = 2; c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(4, 0, 0, 0);
-        datosEquipo.add(botonesEquipo, c);
-
-        JPanel integrantes = new JPanel(new BorderLayout(0, 6));
-        integrantes.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("2. Integrantes (mínimo 2, máximo 3)"), new EmptyBorder(2, 10, 8, 10)));
-        JPanel formProg = new JPanel(new GridBagLayout());
-        Estilo.fila(formProg, 0, "Nombre:", txtNombre);
-        Estilo.fila(formProg, 1, "Apellidos:", txtApellidos);
-        btnAnadir.setEnabled(false);
-        btnAnadir.addActionListener(e -> anadirProgramador());
-        JPanel botonAnadir = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        botonAnadir.add(btnAnadir);
-        JPanel norteInt = new JPanel(new BorderLayout(0, 4));
-        norteInt.add(formProg, BorderLayout.NORTH);
-        norteInt.add(botonAnadir, BorderLayout.CENTER);
-        lblContador.setName("lblContador");
-        lblContador.setFont(lblContador.getFont().deriveFont(Font.BOLD));
-        norteInt.add(lblContador, BorderLayout.SOUTH);
-
-        JTable tabla = new JTable(modeloTabla);
-        tabla.setName("tblIntegrantes");
-        tabla.setRowHeight(24);
-        tabla.getColumnModel().getColumn(0).setMaxWidth(40);
-        JScrollPane scrollTabla = new JScrollPane(tabla);
-        scrollTabla.setColumnHeaderView(tabla.getTableHeader());
-        scrollTabla.setPreferredSize(new Dimension(100, 105));
-        integrantes.add(norteInt, BorderLayout.NORTH);
-        integrantes.add(scrollTabla, BorderLayout.CENTER);
-
-        lblEstado.setName("lblEstado");
-        lblEstado.setBorder(new EmptyBorder(2, 6, 2, 6));
-        lblEstado.setPreferredSize(new Dimension(100, 40));
-
-        JPanel centro = new JPanel(new BorderLayout(0, 8));
-        centro.setBorder(new EmptyBorder(12, 14, 8, 14));
-        JPanel pila = new JPanel(new BorderLayout(0, 8));
-        pila.add(datosEquipo, BorderLayout.NORTH);
-        pila.add(integrantes, BorderLayout.CENTER);
-        centro.add(pila, BorderLayout.CENTER);
-        centro.add(lblEstado, BorderLayout.SOUTH);
-        add(centro, BorderLayout.CENTER);
-
-        setPreferredSize(new Dimension(640, 640));
-    }
-
-    private void crearEquipo() {
-        try {
-            equipo = new EquipoMaratonProgramacion(
-                    txtEquipo.getText(), txtUniversidad.getText(), txtLenguaje.getText());
-            txtEquipo.setEnabled(false);
-            txtUniversidad.setEnabled(false);
-            txtLenguaje.setEnabled(false);
-            btnCrearEquipo.setEnabled(false);
-            btnAnadir.setEnabled(true);
-            actualizarContador();
-            Estilo.estado(lblEstado, "Equipo «" + equipo.getNombreEquipo()
-                    + "» creado. Añada de 2 a 3 integrantes.", false);
-        } catch (IllegalArgumentException e) {
-            Estilo.estado(lblEstado, "Error: " + e.getMessage(), true);
-        }
-    }
-
-    private void anadirProgramador() {
-        if (equipo == null) {
-            return;
-        }
-        try {
-            String nombre = txtNombre.getText().trim();
-            String apellidos = txtApellidos.getText().trim();
-            EquipoMaratonProgramacion.validarCampo("Nombre", nombre);
-            EquipoMaratonProgramacion.validarCampo("Apellidos", apellidos);
-            equipo.anadir(new Programador(nombre, apellidos));
-
-            modeloTabla.addRow(new Object[]{equipo.getTamanoEquipo(), nombre, apellidos});
-            txtNombre.setText("");
-            txtApellidos.setText("");
-            txtNombre.requestFocusInWindow();
-            actualizarContador();
-            Estilo.estado(lblEstado, "Programador «" + nombre + " " + apellidos + "» añadido al equipo.", false);
-        } catch (Exception e) {
-            Estilo.estado(lblEstado, "Excepción: " + e.getMessage(), true);
-        }
-    }
-
-    private void actualizarContador() {
-        int n = equipo.getTamanoEquipo();
-        String situacion;
-        if (equipo.estaLleno()) {
-            situacion = "equipo completo";
-        } else if (equipo.tieneMinimoIntegrantes()) {
-            situacion = "mínimo cumplido, aún puede añadir uno más";
-        } else {
-            situacion = "faltan integrantes para el mínimo de " + EquipoMaratonProgramacion.MINIMO_INTEGRANTES;
-        }
-        lblContador.setText("Integrantes: " + n + "/" + EquipoMaratonProgramacion.MAXIMO_INTEGRANTES
-                + " · " + situacion);
-    }
-
-    private void nuevoEquipo() {
-        equipo = null;
-        modeloTabla.setRowCount(0);
-        for (JTextField campo : new JTextField[]{txtEquipo, txtUniversidad, txtLenguaje, txtNombre, txtApellidos}) {
-            campo.setText("");
-        }
-        txtEquipo.setEnabled(true);
-        txtUniversidad.setEnabled(true);
-        txtLenguaje.setEnabled(true);
-        btnCrearEquipo.setEnabled(true);
-        btnAnadir.setEnabled(false);
-        lblContador.setText("Primero cree el equipo.");
-        lblEstado.setText(" ");
+public class Main {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame ventana = new JFrame("Ejercicio 4 – Equipo de maratón");
+            ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            ventana.setContentPane(new PanelEquipoMaraton());
+            ventana.pack();
+            ventana.setLocationRelativeTo(null);
+            ventana.setVisible(true);
+        });
     }
 }
 
 class EquipoMaratonProgramacion {
+
     public static final int MINIMO_INTEGRANTES = 2;
     public static final int MAXIMO_INTEGRANTES = 3;
-
     public static final int LONGITUD_LIMITE = 20;
 
     private final String nombreEquipo;
@@ -173,13 +28,19 @@ class EquipoMaratonProgramacion {
     private final Programador[] programadores;
     private int tamanoEquipo;
 
-    public EquipoMaratonProgramacion(String nombreEquipo, String universidad, String lenguajeProgramacion) {
+    public EquipoMaratonProgramacion(
+            String nombreEquipo,
+            String universidad,
+            String lenguajeProgramacion) {
+
         exigir(nombreEquipo, "El nombre del equipo es obligatorio.");
         exigir(universidad, "La universidad es obligatoria.");
         exigir(lenguajeProgramacion, "El lenguaje de programación es obligatorio.");
+
         this.nombreEquipo = nombreEquipo.trim();
         this.universidad = universidad.trim();
         this.lenguajeProgramacion = lenguajeProgramacion.trim();
+
         this.programadores = new Programador[MAXIMO_INTEGRANTES];
         this.tamanoEquipo = 0;
     }
@@ -200,37 +61,63 @@ class EquipoMaratonProgramacion {
 
     public void anadir(Programador programador) throws Exception {
         if (estaLleno()) {
-            throw new Exception("El equipo está completo. No se pudo agregar programador.");
+            throw new Exception(
+                    "El equipo está completo. No se pudo agregar programador."
+            );
         }
+
         programadores[tamanoEquipo] = programador;
         tamanoEquipo++;
     }
 
-    public static void validarCampo(String etiqueta, String campo) throws Exception {
+    public static void validarCampo(String etiqueta, String campo)
+            throws Exception {
+
         if (campo == null || campo.isBlank()) {
             throw new Exception("El campo " + etiqueta + " es obligatorio.");
         }
+
         for (int j = 0; j < campo.length(); j++) {
             char c = campo.charAt(j);
+
             if (Character.isDigit(c)) {
-                throw new Exception("El campo " + etiqueta + " no puede tener dígitos.");
+                throw new Exception(
+                        "El campo " + etiqueta + " no puede tener dígitos."
+                );
             }
         }
+
         if (campo.length() >= LONGITUD_LIMITE) {
-            throw new Exception("El campo " + etiqueta + " debe tener menos de "
-                    + LONGITUD_LIMITE + " caracteres.");
+            throw new Exception(
+                    "El campo " + etiqueta + " debe tener menos de "
+                    + LONGITUD_LIMITE + " caracteres."
+            );
         }
     }
 
-    public String getNombreEquipo()          { return nombreEquipo; }
-    public String getUniversidad()           { return universidad; }
-    public String getLenguajeProgramacion()  { return lenguajeProgramacion; }
-    public int getTamanoEquipo()             { return tamanoEquipo; }
+    public String getNombreEquipo() {
+        return nombreEquipo;
+    }
 
-    public Programador getProgramador(int i) { return programadores[i]; }
+    public String getUniversidad() {
+        return universidad;
+    }
+
+    public String getLenguajeProgramacion() {
+        return lenguajeProgramacion;
+    }
+
+    public int getTamanoEquipo() {
+        return tamanoEquipo;
+    }
+
+    public Programador getProgramador(int i) {
+        return programadores[i];
+    }
 }
 
 class Programador {
+
     private final String nombre;
     private final String apellidos;
 
@@ -239,6 +126,357 @@ class Programador {
         this.apellidos = apellidos;
     }
 
-    public String getNombre()    { return nombre; }
-    public String getApellidos() { return apellidos; }
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+}
+
+class PanelEquipoMaraton extends JPanel {
+
+    private final JTextField txtEquipo = Estilo.campo(22);
+    private final JTextField txtUniversidad = Estilo.campo(22);
+    private final JTextField txtLenguaje = Estilo.campo(22);
+
+    private final JButton btnCrearEquipo =
+            Estilo.boton("Crear equipo");
+
+    private final JTextField txtNombre = Estilo.campo(22);
+    private final JTextField txtApellidos = Estilo.campo(22);
+
+    private final JButton btnAnadir =
+            Estilo.boton("Añadir programador");
+
+    private final JLabel lblContador =
+            new JLabel("Primero cree el equipo.");
+
+    private final DefaultTableModel modeloTabla =
+            new DefaultTableModel(
+                    new Object[]{"#", "Nombre", "Apellidos"}, 0) {
+
+                @Override
+                public boolean isCellEditable(int fila, int columna) {
+                    return false;
+                }
+            };
+
+    private final JLabel lblEstado = new JLabel(" ");
+
+    private EquipoMaratonProgramacion equipo;
+
+    public PanelEquipoMaraton() {
+
+        setLayout(new BorderLayout());
+
+        add(Estilo.encabezado(
+                "Ejercicio 4 · Validación de campos (6.7)",
+                "Texto guía, pág. 418 – Clases EquipoMaratonProgramacion y Programador"
+        ), BorderLayout.NORTH);
+
+        JPanel datosEquipo = new JPanel(new GridBagLayout());
+
+        datosEquipo.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createTitledBorder("1. Datos del equipo"),
+                        new EmptyBorder(2, 10, 6, 10)
+                )
+        );
+
+        Estilo.fila(datosEquipo, 0, "Nombre del equipo:", txtEquipo);
+        Estilo.fila(datosEquipo, 1, "Universidad:", txtUniversidad);
+        Estilo.fila(datosEquipo, 2, "Lenguaje de programación:", txtLenguaje);
+
+        JButton btnNuevo = Estilo.boton("Nuevo equipo");
+
+        btnCrearEquipo.addActionListener(e -> crearEquipo());
+        btnNuevo.addActionListener(e -> nuevoEquipo());
+
+        JPanel botonesEquipo =
+                new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+
+        botonesEquipo.add(btnNuevo);
+        botonesEquipo.add(btnCrearEquipo);
+
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 2;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(4, 0, 0, 0);
+
+        datosEquipo.add(botonesEquipo, c);
+
+        JPanel integrantes = new JPanel(new BorderLayout(0, 6));
+
+        integrantes.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createTitledBorder(
+                                "2. Integrantes (mínimo 2, máximo 3)"
+                        ),
+                        new EmptyBorder(2, 10, 8, 10)
+                )
+        );
+
+        JPanel formProg = new JPanel(new GridBagLayout());
+
+        Estilo.fila(formProg, 0, "Nombre:", txtNombre);
+        Estilo.fila(formProg, 1, "Apellidos:", txtApellidos);
+
+        btnAnadir.setEnabled(false);
+        btnAnadir.addActionListener(e -> anadirProgramador());
+
+        JPanel botonAnadir =
+                new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+
+        botonAnadir.add(btnAnadir);
+
+        JPanel norteInt = new JPanel(new BorderLayout(0, 4));
+
+        norteInt.add(formProg, BorderLayout.NORTH);
+        norteInt.add(botonAnadir, BorderLayout.CENTER);
+
+        lblContador.setFont(
+                lblContador.getFont().deriveFont(Font.BOLD)
+        );
+
+        norteInt.add(lblContador, BorderLayout.SOUTH);
+
+        JTable tabla = new JTable(modeloTabla);
+
+        tabla.setRowHeight(24);
+        tabla.getColumnModel().getColumn(0).setMaxWidth(40);
+
+        JScrollPane scrollTabla = new JScrollPane(tabla);
+
+        scrollTabla.setColumnHeaderView(tabla.getTableHeader());
+        scrollTabla.setPreferredSize(new Dimension(100, 105));
+
+        integrantes.add(norteInt, BorderLayout.NORTH);
+        integrantes.add(scrollTabla, BorderLayout.CENTER);
+
+        lblEstado.setBorder(new EmptyBorder(2, 6, 2, 6));
+        lblEstado.setPreferredSize(new Dimension(100, 40));
+
+        JPanel centro = new JPanel(new BorderLayout(0, 8));
+
+        centro.setBorder(new EmptyBorder(12, 14, 8, 14));
+
+        JPanel pila = new JPanel(new BorderLayout(0, 8));
+
+        pila.add(datosEquipo, BorderLayout.NORTH);
+        pila.add(integrantes, BorderLayout.CENTER);
+
+        centro.add(pila, BorderLayout.CENTER);
+        centro.add(lblEstado, BorderLayout.SOUTH);
+
+        add(centro, BorderLayout.CENTER);
+
+        setPreferredSize(new Dimension(640, 640));
+    }
+
+    private void crearEquipo() {
+
+        try {
+            equipo = new EquipoMaratonProgramacion(
+                    txtEquipo.getText(),
+                    txtUniversidad.getText(),
+                    txtLenguaje.getText()
+            );
+
+            txtEquipo.setEnabled(false);
+            txtUniversidad.setEnabled(false);
+            txtLenguaje.setEnabled(false);
+
+            btnCrearEquipo.setEnabled(false);
+            btnAnadir.setEnabled(true);
+
+            actualizarContador();
+
+            Estilo.estado(
+                    lblEstado,
+                    "Equipo «" + equipo.getNombreEquipo()
+                    + "» creado. Añada de 2 a 3 integrantes.",
+                    false
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            Estilo.estado(
+                    lblEstado,
+                    "Error: " + e.getMessage(),
+                    true
+            );
+        }
+    }
+
+    private void anadirProgramador() {
+
+        if (equipo == null) {
+            return;
+        }
+
+        try {
+            String nombre = txtNombre.getText().trim();
+            String apellidos = txtApellidos.getText().trim();
+
+            EquipoMaratonProgramacion.validarCampo(
+                    "Nombre", nombre
+            );
+
+            EquipoMaratonProgramacion.validarCampo(
+                    "Apellidos", apellidos
+            );
+
+            equipo.anadir(new Programador(nombre, apellidos));
+
+            modeloTabla.addRow(
+                    new Object[]{
+                            equipo.getTamanoEquipo(),
+                            nombre,
+                            apellidos
+                    }
+            );
+
+            txtNombre.setText("");
+            txtApellidos.setText("");
+
+            txtNombre.requestFocusInWindow();
+
+            actualizarContador();
+
+            Estilo.estado(
+                    lblEstado,
+                    "Programador «" + nombre + " " + apellidos
+                    + "» añadido al equipo.",
+                    false
+            );
+
+        } catch (Exception e) {
+
+            Estilo.estado(
+                    lblEstado,
+                    "Excepción: " + e.getMessage(),
+                    true
+            );
+        }
+    }
+
+    private void actualizarContador() {
+
+        int n = equipo.getTamanoEquipo();
+
+        String situacion;
+
+        if (equipo.estaLleno()) {
+            situacion = "equipo completo";
+
+        } else if (equipo.tieneMinimoIntegrantes()) {
+            situacion = "mínimo cumplido, aún puede añadir uno más";
+
+        } else {
+            situacion = "faltan integrantes para el mínimo de "
+                    + EquipoMaratonProgramacion.MINIMO_INTEGRANTES;
+        }
+
+        lblContador.setText(
+                "Integrantes: " + n + "/"
+                + EquipoMaratonProgramacion.MAXIMO_INTEGRANTES
+                + " · " + situacion
+        );
+    }
+
+    private void nuevoEquipo() {
+
+        equipo = null;
+        modeloTabla.setRowCount(0);
+
+        for (JTextField campo : new JTextField[]{
+                txtEquipo,
+                txtUniversidad,
+                txtLenguaje,
+                txtNombre,
+                txtApellidos
+        }) {
+            campo.setText("");
+        }
+
+        txtEquipo.setEnabled(true);
+        txtUniversidad.setEnabled(true);
+        txtLenguaje.setEnabled(true);
+
+        btnCrearEquipo.setEnabled(true);
+        btnAnadir.setEnabled(false);
+
+        lblContador.setText("Primero cree el equipo.");
+        lblEstado.setText(" ");
+    }
+}
+
+class Estilo {
+
+    static JTextField campo(int columnas) {
+        return new JTextField(columnas);
+    }
+
+    static JButton boton(String texto) {
+        return new JButton(texto);
+    }
+
+    static JPanel encabezado(String titulo, String subtitulo) {
+
+        JPanel panel = new JPanel(new GridLayout(2, 1));
+
+        panel.setBorder(new EmptyBorder(12, 14, 8, 14));
+
+        JLabel etiquetaTitulo = new JLabel(titulo);
+
+        etiquetaTitulo.setFont(
+                etiquetaTitulo.getFont().deriveFont(Font.BOLD, 17f)
+        );
+
+        panel.add(etiquetaTitulo);
+        panel.add(new JLabel(subtitulo));
+
+        return panel;
+    }
+
+    static void fila(
+            JPanel panel,
+            int fila,
+            String etiqueta,
+            JComponent campo) {
+
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.gridy = fila;
+        c.insets = new Insets(4, 4, 4, 8);
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+
+        panel.add(new JLabel(etiqueta), c);
+
+        c.gridx = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        panel.add(campo, c);
+    }
+
+    static void estado(
+            JLabel etiqueta,
+            String mensaje,
+            boolean error) {
+
+        etiqueta.setText(mensaje);
+
+        etiqueta.setForeground(
+                error
+                        ? new Color(180, 35, 35)
+                        : new Color(30, 120, 60)
+        );
+    }
 }
