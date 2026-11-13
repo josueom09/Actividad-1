@@ -1,0 +1,252 @@
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame ventana = new JFrame("Ejercicio 5 – Lectura de archivos");
+            ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            ventana.setContentPane(new PanelLeerArchivo());
+            ventana.pack();
+            ventana.setLocationRelativeTo(null);
+            ventana.setVisible(true);
+        });
+    }
+}
+
+class LeerArchivo {
+
+    private LeerArchivo() {
+    }
+
+    public static String leer(String nombreArchivo) throws IOException {
+
+        StringBuilder contenido = new StringBuilder();
+
+        try (
+                FileInputStream archivo = new FileInputStream(nombreArchivo);
+                InputStreamReader conversor = new InputStreamReader(
+                        archivo, StandardCharsets.UTF_8
+                );
+                BufferedReader filtro = new BufferedReader(conversor)
+        ) {
+
+            String linea = filtro.readLine();
+
+            while (linea != null) {
+                contenido.append(linea).append('\n');
+                linea = filtro.readLine();
+            }
+        }
+
+        return contenido.toString();
+    }
+}
+
+class PanelLeerArchivo extends JPanel {
+
+    private final JTextField txtRuta = Estilo.campo(30);
+    private final JLabel lblEstado = new JLabel(" ");
+    private final JTextArea txtSalida = Estilo.areaSalida();
+
+    public PanelLeerArchivo() {
+
+        setLayout(new BorderLayout());
+
+        add(
+                Estilo.encabezado(
+                        "Ejercicio 5 · Lectura de archivos (6.8)",
+                        "Texto guía, pág. 427 – Clase LeerArchivo"
+                ),
+                BorderLayout.NORTH
+        );
+
+        txtRuta.setText("prueba.txt");
+
+        JButton btnExaminar = Estilo.boton("Examinar...");
+        JButton btnLeer = Estilo.boton("Leer archivo");
+
+        btnExaminar.addActionListener(e -> examinar());
+        btnLeer.addActionListener(e -> leer());
+
+        JPanel seleccion = new JPanel(new BorderLayout(8, 0));
+
+        seleccion.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createTitledBorder("Archivo de texto"),
+                        new EmptyBorder(4, 8, 6, 8)
+                )
+        );
+
+        seleccion.add(txtRuta, BorderLayout.CENTER);
+
+        JPanel botones =
+                new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+
+        botones.add(btnExaminar);
+        botones.add(btnLeer);
+
+        seleccion.add(botones, BorderLayout.EAST);
+
+        lblEstado.setBorder(new EmptyBorder(4, 4, 4, 4));
+
+        JPanel norte = new JPanel(new BorderLayout());
+
+        norte.add(seleccion, BorderLayout.NORTH);
+        norte.add(lblEstado, BorderLayout.SOUTH);
+
+        JPanel centro = new JPanel(new BorderLayout(0, 6));
+
+        centro.setBorder(new EmptyBorder(14, 14, 14, 14));
+
+        centro.add(norte, BorderLayout.NORTH);
+
+        centro.add(
+                Estilo.conScroll(txtSalida, "Contenido del archivo"),
+                BorderLayout.CENTER
+        );
+
+        add(centro, BorderLayout.CENTER);
+
+        setPreferredSize(new Dimension(680, 480));
+    }
+
+    private void examinar() {
+
+        JFileChooser selector = new JFileChooser(new File("."));
+
+        selector.setFileFilter(
+                new FileNameExtensionFilter(
+                        "Archivos de texto (*.txt)",
+                        "txt"
+                )
+        );
+
+        if (selector.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+            txtRuta.setText(
+                    selector.getSelectedFile().getPath()
+            );
+
+            leer();
+        }
+    }
+
+    private void leer() {
+
+        String ruta = txtRuta.getText().trim();
+
+        try {
+
+            String contenido = LeerArchivo.leer(ruta);
+
+            txtSalida.setText(contenido);
+            txtSalida.setCaretPosition(0);
+
+            long lineas = contenido.chars()
+                    .filter(ch -> ch == '\n')
+                    .count();
+
+            Estilo.estado(
+                    lblEstado,
+                    "Archivo leído correctamente (" + lineas + " líneas).",
+                    false
+            );
+
+        } catch (IOException e) {
+
+            txtSalida.setText("");
+
+            String detalle;
+
+            if (e instanceof FileNotFoundException) {
+                detalle = "el archivo «" + ruta
+                        + "» no existe o no se puede abrir.";
+            } else {
+                detalle = e.getMessage();
+            }
+
+            Estilo.estado(
+                    lblEstado,
+                    "No se pudo leer el archivo.\nDetalle: " + detalle,
+                    true
+            );
+        }
+    }
+}
+
+class Estilo {
+
+    static JTextField campo(int columnas) {
+        return new JTextField(columnas);
+    }
+
+    static JTextArea areaSalida() {
+
+        JTextArea area = new JTextArea();
+
+        area.setEditable(false);
+        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+
+        return area;
+    }
+
+    static JButton boton(String texto) {
+        return new JButton(texto);
+    }
+
+    static JPanel encabezado(String titulo, String subtitulo) {
+
+        JPanel panel = new JPanel(new GridLayout(2, 1));
+
+        panel.setBorder(new EmptyBorder(12, 14, 8, 14));
+
+        JLabel etiquetaTitulo = new JLabel(titulo);
+
+        etiquetaTitulo.setFont(
+                etiquetaTitulo.getFont().deriveFont(Font.BOLD, 17f)
+        );
+
+        panel.add(etiquetaTitulo);
+        panel.add(new JLabel(subtitulo));
+
+        return panel;
+    }
+
+    static JScrollPane conScroll(
+            JTextArea area,
+            String titulo) {
+
+        JScrollPane scroll = new JScrollPane(area);
+
+        scroll.setBorder(
+                BorderFactory.createTitledBorder(titulo)
+        );
+
+        return scroll;
+    }
+
+    static void estado(
+            JLabel etiqueta,
+            String mensaje,
+            boolean error) {
+
+        etiqueta.setText(mensaje);
+
+        etiqueta.setForeground(
+                error
+                        ? new Color(180, 35, 35)
+                        : new Color(30, 120, 60)
+        );
+    }
+}
